@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>英超积分榜</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 12px;
+      background-color: #f5f5f5;
+      color: #333;
+      margin: 0;
+    }
+    h2 {
+      text-align: center;
+      margin-top: 0;
+      font-size: 1.4rem;
+    }
+    .filters {
+      margin-bottom: 16px;
+      padding: 14px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+    .filters > * {
+      flex: 1;
+      min-width: 120px;
+    }
+    label {
+      font-weight: bold;
+      white-space: nowrap;
+      font-size: 0.95rem;
+    }
+    select, button {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #0078d4;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-weight: bold;
+      min-width: 80px;
+    }
+    button:hover {
+      background-color: #005a9e;
+    }
+
+    /* 表格容器：允许横向滚动 */
+    .table-container {
+      overflow-x: auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      -webkit-overflow-scrolling: touch; /* iOS 滚动更流畅 */
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 600px; /* 确保表格不会压缩太小 */
+    }
+    th, td {
+      padding: 10px 8px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+      font-size: 0.9rem;
+    }
+    th {
+      background-color: #37003c;
+      color: white;
+      position: sticky;
+      top: 0;
+    }
+    img.team-logo {
+      width: 32px;
+      height: 32px;
+      vertical-align: middle;
+      border-radius: 4px;
+    }
+
+    .loading, .error, .no-data {
+      padding: 14px;
+      text-align: center;
+      margin-top: 12px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+    .loading { background: #e9ecef; color: #6c757d; }
+    .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .no-data { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+
+    /* 手机端微调 */
+    @media (max-width: 600px) {
+      body { padding: 8px; }
+      h2 { font-size: 1.2rem; }
+      .filters {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      th, td {
+        padding: 8px 6px;
+        font-size: 0.85rem;
+      }
+      img.team-logo {
+        width: 28px;
+        height: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h2>英超联赛积分榜</h2>
+
+<div class="filters">
+  <div>
+    <label for="season">赛季：</label>
+    <select id="season"></select>
+  </div>
+  <div>
+    <label for="round">轮次：</label>
+    <select id="round"></select>
+  </div>
+  <div>
+    <button onclick="fetchStandings()">查询</button>
+  </div>
+</div>
+
+<div id="result"></div>
+
+<script>
+  // 初始化赛季选项（2000 ~ 今年）
+  function createSeasonOptions() {
+    const currentYear = new Date().getFullYear();
+    const startYear = 2000;
+    const seasonSelect = document.getElementById('season');
+
+    for (let year = currentYear; year >= startYear; year--) {
+      const nextYear = year + 1;
+      const option = document.createElement('option');
+      // 注意：你原来的逻辑是 <2008 用 (year+1-2000)，这里保留
+      if (year < 2008) {
+        option.value = (year + 1 - 2000).toString();
+      } else {
+        option.value = year.toString();
+      }
+      option.text = `${year}/${String(nextYear).slice(-2)}`;
+      option.selected = (year === currentYear);
+      seasonSelect.appendChild(option);
+    }
+  }
+
+  // 初始化轮次（1~38）
+  const roundSelect = document.getElementById('round');
+  for (let i = 1; i <= 38; i++) {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `第 ${i} 轮`;
+    roundSelect.appendChild(opt);
+  }
+  roundSelect.value = '38';
+
+  async function fetchStandings() {
+    const season = document.getElementById('season').value;
+    const round = document.getElementById('round').value;
+
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = '<div class="loading">正在加载积分榜数据...</div>';
+
+    try {
+      const isOldSeason = parseInt(season) <= 2007;
+      let apiUrl;
+      if (isOldSeason) {
+        apiUrl = `https://sdp-prem-prod.premier-league-prod.pulselive.com/api/v5/competitions/8/seasons/${encodeURIComponent(season)}/standings?live=false`;
+      } else {
+        apiUrl = `https://sdp-prem-prod.premier-league-prod.pulselive.com/api/v5/competitions/8/seasons/${encodeURIComponent(season)}/matchweeks/${encodeURIComponent(round)}/standings?live=false`;
+      }
+
+      const response = await fetch(apiUrl);
+      if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+      const data = await response.json();
+
+      if (!data.tables?.[0]?.entries?.length) {
+        resultDiv.innerHTML = '<div class="no-data">该赛季/轮次暂无积分榜数据。</div>';
+        return;
+      }
+
+      const entries = data.tables[0].entries;
+      let html = `
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>队徽</th>
+                <th>队名</th>
+                <th>轮次</th>
+                <th>胜</th>
+                <th>平</th>
+                <th>负</th>
+                <th>进球</th>
+                <th>失球</th>
+                <th>净胜球</th>
+                <th>积分</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      entries.forEach(entry => {
+        const team = entry.team;
+        const overall = entry.overall || {};
+        const gd = (overall.goalsFor || 0) - (overall.goalsAgainst || 0);
+        const badgeUrl = `https://resources.premierleague.com/premierleague25/badges/${team.id}.svg`;
+
+        html += `
+          <tr>
+            <td><img src="${badgeUrl}" alt="${team.name}" class="team-logo" onerror="this.style.opacity=0.5"></td>
+            <td>${team.name || '—'}</td>
+            <td>${overall.played || '—'}</td>
+            <td>${overall.won || 0}</td>
+            <td>${overall.drawn || 0}</td>
+            <td>${overall.lost || 0}</td>
+            <td>${overall.goalsFor || 0}</td>
+            <td>${overall.goalsAgainst || 0}</td>
+            <td>${gd}</td>
+            <td>${overall.points || 0}</td>
+          </tr>
+        `;
+      });
+
+      html += '</tbody></table></div>';
+      resultDiv.innerHTML = html;
+
+    } catch (error) {
+      console.error('Error:', error);
+      resultDiv.innerHTML = `<div class="error">❌ 数据加载失败：<br>${error.message}</div>`;
+    }
+  }
+
+  window.onload = () => {
+    createSeasonOptions();
+    // 可选：自动加载当前赛季末轮数据
+    // fetchStandings();
+  };
+</script>
+
+</body>
+</html>
