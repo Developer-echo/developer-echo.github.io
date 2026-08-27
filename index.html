@@ -1,260 +1,430 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>英超积分榜</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      padding: 12px;
-      background-color: #f5f5f5;
-      color: #333;
-      margin: 0;
-    }
-    h2 {
-      text-align: center;
-      margin-top: 0;
-      font-size: 1.4rem;
-    }
-    .filters {
-      margin-bottom: 16px;
-      padding: 14px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      justify-content: center;
-    }
-    .filters > * {
-      flex: 1;
-      min-width: 120px;
-    }
-    label {
-      font-weight: bold;
-      white-space: nowrap;
-      font-size: 0.95rem;
-    }
-    select, button {
-      width: 100%;
-      padding: 8px 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-      box-sizing: border-box;
-    }
-    button {
-      background-color: #0078d4;
-      color: white;
-      cursor: pointer;
-      transition: background 0.2s;
-      font-weight: bold;
-      min-width: 80px;
-    }
-    button:hover {
-      background-color: #005a9e;
-    }
-
-    /* 表格容器：允许横向滚动 */
-    .table-container {
-      overflow-x: auto;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      -webkit-overflow-scrolling: touch; /* iOS 滚动更流畅 */
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 600px; /* 确保表格不会压缩太小 */
-    }
-    th, td {
-      padding: 10px 8px;
-      text-align: center;
-      border-bottom: 1px solid #eee;
-      font-size: 0.9rem;
-    }
-    th {
-      background-color: #37003c;
-      color: white;
-      position: sticky;
-      top: 0;
-    }
-    img.team-logo {
-      width: 32px;
-      height: 32px;
-      vertical-align: middle;
-      border-radius: 4px;
-    }
-
-    .loading, .error, .no-data {
-      padding: 14px;
-      text-align: center;
-      margin-top: 12px;
-      border-radius: 6px;
-      font-size: 0.95rem;
-    }
-    .loading { background: #e9ecef; color: #6c757d; }
-    .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-    .no-data { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
-
-    /* 手机端微调 */
-    @media (max-width: 600px) {
-      body { padding: 8px; }
-      h2 { font-size: 1.2rem; }
-      .filters {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      th, td {
-        padding: 8px 6px;
-        font-size: 0.85rem;
-      }
-      img.team-logo {
-        width: 28px;
-        height: 28px;
-      }
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L1u ZhiHenG. · .NET 后端工程师</title>
+  <meta name="description" content="L1u ZhiHenG.，七年 .NET 服务端开发者。微服务架构、云原生运维，以及一颗北伦敦的心。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/app.js" defer></script>
 </head>
 <body>
 
-<h2>英超联赛积分榜</h2>
+  <!-- ============ 导航栏 ============ -->
+  <header class="nav" id="top">
+    <div class="nav-inner">
+      <a class="brand" href="#top" aria-label="L1u ZhiHenG 首页">
+        <span class="brand-word">L1u ZhiHenG</span>
+        <span class="brand-dot" aria-hidden="true"></span>
+      </a>
 
-<div class="filters">
-  <div>
-    <label for="season">赛季：</label>
-    <select id="season"></select>
-  </div>
-  <div>
-    <label for="round">轮次：</label>
-    <select id="round"></select>
-  </div>
-  <div>
-    <button onclick="fetchStandings()">查询</button>
-  </div>
-</div>
+      <nav class="nav-links" aria-label="主导航">
+        <a href="#top" class="is-active">首页</a>
+        <a href="#about">关于</a>
+        <a href="#stack">技术栈</a>
+        <a href="#projects">项目</a>
+        <a href="#blog">博客</a>
+        <a href="#gooner">Gooner Corner</a>
+      </nav>
 
-<div id="result"></div>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="切换深色模式" title="切换深色模式">
+          <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M20 13.6A8 8 0 0 1 10.4 4 8 8 0 1 0 20 13.6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          </svg>
+          <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.2 5.2l1.7 1.7M17.1 17.1l1.7 1.7M18.8 5.2l-1.7 1.7M6.9 17.1l-1.7 1.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <a class="btn btn-primary btn-nav" href="mailto:lzh.message@gmail.com">联系我</a>
+      </div>
+    </div>
+  </header>
 
-<script>
-  // 初始化赛季选项（2000 ~ 今年）
-  function createSeasonOptions() {
-    const currentYear = new Date().getFullYear();
-    const startYear = 2000;
-    const seasonSelect = document.getElementById('season');
+  <main class="page">
 
-    for (let year = currentYear; year >= startYear; year--) {
-      const nextYear = year + 1;
-      const option = document.createElement('option');
-      // 注意：你原来的逻辑是 <2008 用 (year+1-2000)，这里保留
-      if (year < 2008) {
-        option.value = (year + 1 - 2000).toString();
-      } else {
-        option.value = year.toString();
-      }
-      option.text = `${year}/${String(nextYear).slice(-2)}`;
-      option.selected = (year === currentYear);
-      seasonSelect.appendChild(option);
+    <!-- ============ Hero ============ -->
+    <section class="hero">
+      <div class="hero-grid">
+
+        <div class="hero-copy">
+          <p class="badge reveal">
+            <span class="badge-dot" aria-hidden="true"></span>
+            .NET 后端工程师 · 微服务架构 · DevOps
+          </p>
+
+          <h1 class="hero-title reveal">把复杂拆到最简，<br>把稳定留在线上。</h1>
+          <div class="accent-bar reveal" aria-hidden="true"></div>
+
+          <p class="hero-sub reveal">我是 L1u ZhiHenG.，七年 .NET 服务端开发者。擅长微服务架构设计与落地——从领域建模到服务拆分，从 CI/CD 流水线到 Kubernetes 集群，让系统在生产环境安静、稳定地运行。</p>
+
+          <div class="cta-row reveal">
+            <a class="btn btn-primary" href="#projects">查看项目</a>
+            <a class="btn btn-ghost" href="#blog">订阅博客</a>
+          </div>
+
+          <dl class="stats reveal">
+            <div class="stat">
+              <dt class="stat-label">年服务端经验</dt>
+              <dd class="stat-value">7+</dd>
+            </div>
+            <div class="stat">
+              <dt class="stat-label">个生产微服务</dt>
+              <dd class="stat-value">24</dd>
+            </div>
+            <div class="stat">
+              <dt class="stat-label">线上可用率</dt>
+              <dd class="stat-value is-accent">99.96%</dd>
+            </div>
+            <div class="stat">
+              <dt class="stat-label">次生产部署</dt>
+              <dd class="stat-value">1,300+</dd>
+            </div>
+          </dl>
+        </div>
+
+        <!-- 代码卡片 -->
+        <div class="hero-visual reveal">
+          <figure class="code-card" role="img" aria-label="OrderService.cs 代码示例">
+            <div class="code-bar">
+              <span class="win-dot win-red" aria-hidden="true"></span>
+              <span class="win-dot win-yellow" aria-hidden="true"></span>
+              <span class="win-dot win-green" aria-hidden="true"></span>
+              <span class="code-filename">OrderService.cs</span>
+              <span class="prod-badge"><span class="prod-dot" aria-hidden="true"></span>Production</span>
+            </div>
+
+            <pre class="code-body"><code><span class="tok-c">// 订单服务：拆解复杂，保持简单</span>
+<span class="tok-k">public class</span> <span class="tok-t">OrderService</span> : <span class="tok-t">IOrderService</span>
+{
+    <span class="tok-f">private readonly</span> <span class="tok-t">IOrderRepository</span> _repo;
+    <span class="tok-f">private readonly</span> <span class="tok-t">IMessageBus</span> _bus;
+
+    <span class="tok-m">public async Task&lt;Order&gt; CreateAsync(</span>
+        <span class="tok-t">CreateOrderCommand</span> cmd,
+        <span class="tok-t">CancellationToken</span> ct)
+    {
+        <span class="tok-p">var</span> order = Order.From(cmd);
+
+        <span class="tok-p">await</span> _repo.SaveAsync(order, ct);
+        <span class="tok-p">await</span> _bus.PublishAsync(
+            <span class="tok-t">new OrderCreated</span>(order.Id), ct);
+
+        <span class="tok-p">return</span> order;
     }
-  }
+}</code></pre>
 
-  // 初始化轮次（1~38）
-  const roundSelect = document.getElementById('round');
-  for (let i = 1; i <= 38; i++) {
-    const opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = `第 ${i} 轮`;
-    roundSelect.appendChild(opt);
-  }
-  roundSelect.value = '38';
+            <div class="code-footer">
+              <span class="deploy-info">
+                <svg class="check" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M5 12.5l4.5 4.5L19 7.5" stroke="#28C840" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                deploy #1,342 · passed · 3m 41s
+              </span>
+              <span class="deploy-branch">main · v2.4.1</span>
+            </div>
+          </figure>
+        </div>
 
-  async function fetchStandings() {
-    const season = document.getElementById('season').value;
-    const round = document.getElementById('round').value;
+      </div>
+    </section>
 
-    const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = '<div class="loading">正在加载积分榜数据...</div>';
+    <!-- ============ 01 关于 ============ -->
+    <section class="section section-surface" id="about">
+      <header class="section-head reveal">
+        <p class="eyebrow">// 01 关于</p>
+        <h2 class="section-title">七年写一行代码，<br>也写一行原则。</h2>
+      </header>
 
-    try {
-      const isOldSeason = parseInt(season) <= 2007;
-      let apiUrl;
-      if (isOldSeason) {
-        apiUrl = `https://sdp-prem-prod.premier-league-prod.pulselive.com/api/v5/competitions/8/seasons/${encodeURIComponent(season)}/standings?live=false`;
-      } else {
-        apiUrl = `https://sdp-prem-prod.premier-league-prod.pulselive.com/api/v5/competitions/8/seasons/${encodeURIComponent(season)}/matchweeks/${encodeURIComponent(round)}/standings?live=false`;
-      }
+      <div class="about-grid">
+        <div class="about-copy">
+          <p class="about-lead reveal">把稳定写进每一次提交，把优雅留给每一段代码。</p>
+          <p class="about-para reveal">从 2019 年起，我把写 C# 当成排兵布阵。架构图是阵型，命名空间是阵区，每个微服务是一枚棋子——它该上场、该替补、该被换下，都得想清楚。</p>
+          <p class="about-para reveal">在生产里，我更相信「少即是多」：少一层抽象，少一次失败跳转，少一个没人能解释的配置项。系统安静地跑，就是最好的反馈。</p>
 
-      const response = await fetch(apiUrl);
-      if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-      const data = await response.json();
+          <ul class="fact-list reveal">
+            <li class="fact"><span class="fact-dot" aria-hidden="true"></span>现役技术：.NET 8 · C# 12 · ASP.NET Core</li>
+            <li class="fact"><span class="fact-dot" aria-hidden="true"></span>角色：后端开发 / SRE / 偶尔前端</li>
+            <li class="fact"><span class="fact-dot" aria-hidden="true"></span>工作地：中国（早晨写代码型，6:00 已开工）</li>
+            <li class="fact"><span class="fact-dot" aria-hidden="true"></span>主队：Arsenal · 北伦敦是红色的</li>
+          </ul>
+        </div>
 
-      if (!data.tables?.[0]?.entries?.length) {
-        resultDiv.innerHTML = '<div class="no-data">该赛季/轮次暂无积分榜数据。</div>';
-        return;
-      }
+        <aside class="profile-card reveal">
+          <div class="profile-head">
+            <div class="avatar" aria-hidden="true">LZ</div>
+            <div class="profile-name">
+              <p class="profile-fullname">L1u ZhiHenG.</p>
+              <p class="profile-role">.NET 后端工程师</p>
+            </div>
+          </div>
 
-      const entries = data.tables[0].entries;
-      let html = `
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>队徽</th>
-                <th>队名</th>
-                <th>轮次</th>
-                <th>胜</th>
-                <th>平</th>
-                <th>负</th>
-                <th>进球</th>
-                <th>失球</th>
-                <th>净胜球</th>
-                <th>积分</th>
-              </tr>
-            </thead>
-            <tbody>
-      `;
+          <div class="profile-divider" aria-hidden="true"></div>
 
-      entries.forEach(entry => {
-        const team = entry.team;
-        const overall = entry.overall || {};
-        const gd = (overall.goalsFor || 0) - (overall.goalsAgainst || 0);
-        const badgeUrl = `https://resources.premierleague.com/premierleague25/badges/${team.id}.svg`;
+          <dl class="profile-grid">
+            <div class="profile-cell">
+              <dt>工作地</dt>
+              <dd>中国</dd>
+            </div>
+            <div class="profile-cell">
+              <dt>时区</dt>
+              <dd>GMT+8</dd>
+            </div>
+            <div class="profile-cell">
+              <dt>邮箱</dt>
+              <dd>lzh.message</dd>
+            </div>
+            <div class="profile-cell">
+              <dt>关注</dt>
+              <dd class="is-accent">Arsenal</dd>
+            </div>
+          </dl>
 
-        html += `
-          <tr>
-            <td><img src="${badgeUrl}" alt="${team.name}" class="team-logo" onerror="this.style.opacity=0.5"></td>
-            <td>${team.name || '—'}</td>
-            <td>${overall.played || '—'}</td>
-            <td>${overall.won || 0}</td>
-            <td>${overall.drawn || 0}</td>
-            <td>${overall.lost || 0}</td>
-            <td>${overall.goalsFor || 0}</td>
-            <td>${overall.goalsAgainst || 0}</td>
-            <td>${gd}</td>
-            <td>${overall.points || 0}</td>
-          </tr>
-        `;
-      });
+          <p class="status-block">
+            <span class="status-dot" aria-hidden="true"></span>
+            正在重读《Designing Data-Intensive Applications》
+          </p>
+        </aside>
+      </div>
+    </section>
 
-      html += '</tbody></table></div>';
-      resultDiv.innerHTML = html;
+    <!-- ============ 02 技术栈 ============ -->
+    <section class="section" id="stack">
+      <header class="section-head reveal">
+        <p class="eyebrow">// 02 技术栈</p>
+        <h2 class="section-title">趁手的工具，<br>都在这些抽屉里。</h2>
+      </header>
 
-    } catch (error) {
-      console.error('Error:', error);
-      resultDiv.innerHTML = `<div class="error">❌ 数据加载失败：<br>${error.message}</div>`;
-    }
-  }
+      <div class="stack-grid">
+        <article class="stack-card stack-wide reveal">
+          <h3 class="stack-title">语言与运行时</h3>
+          <p class="stack-desc">七年下来换过语言，没换过类型系统。C# 仍是写服务端最舒服的选择。</p>
+          <ul class="chip-row">
+            <li class="chip">C# 12</li>
+            <li class="chip">.NET 8</li>
+            <li class="chip">ASP.NET Core</li>
+            <li class="chip">EF Core</li>
+            <li class="chip">LINQ</li>
+            <li class="chip">xUnit</li>
+            <li class="chip">SignalR</li>
+          </ul>
+        </article>
 
-  window.onload = () => {
-    createSeasonOptions();
-    // 可选：自动加载当前赛季末轮数据
-    // fetchStandings();
-  };
-</script>
+        <article class="stack-card stack-narrow reveal">
+          <h3 class="stack-title">微服务与通信</h3>
+          <p class="stack-desc">让服务之间说话这件事，我宁可慢一点也要说清楚。</p>
+          <ul class="chip-row">
+            <li class="chip">gRPC</li>
+            <li class="chip">RabbitMQ</li>
+            <li class="chip">MassTransit</li>
+            <li class="chip">Consul</li>
+            <li class="chip">Polly</li>
+            <li class="chip">MediatR</li>
+          </ul>
+        </article>
+
+        <article class="stack-card stack-narrow reveal">
+          <h3 class="stack-title">数据与存储</h3>
+          <p class="stack-desc">少冗余、强一致、慢查询归零——这是我的数据三原则。</p>
+          <ul class="chip-row">
+            <li class="chip">PostgreSQL</li>
+            <li class="chip">SQL Server</li>
+            <li class="chip">MongoDB</li>
+            <li class="chip">Redis</li>
+            <li class="chip">Elasticsearch</li>
+          </ul>
+        </article>
+
+        <article class="stack-card stack-wide reveal">
+          <h3 class="stack-title">云原生与运维</h3>
+          <p class="stack-desc">从 docker build 到 kubectl rollout，每一步都写成脚本。</p>
+          <ul class="chip-row">
+            <li class="chip">Docker</li>
+            <li class="chip">Kubernetes</li>
+            <li class="chip">Helm</li>
+            <li class="chip">GitHub Actions</li>
+            <li class="chip">ArgoCD</li>
+            <li class="chip">Prometheus</li>
+            <li class="chip">Grafana</li>
+            <li class="chip">Loki</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ 03 项目 ============ -->
+    <section class="section section-surface" id="projects">
+      <header class="section-head reveal">
+        <p class="eyebrow">// 03 项目</p>
+        <h2 class="section-title">一些拿得出手的<br>战场复盘。</h2>
+      </header>
+
+      <div class="projects-grid">
+        <!-- 特写项目 -->
+        <article class="featured-project reveal">
+          <div class="featured-copy">
+            <p class="project-meta">
+              <span class="year-chip">2024</span>
+              <span class="meta-text">主导项目 · 服务端架构</span>
+            </p>
+            <h3 class="featured-title">订单中台：从单体到 24 个服务</h3>
+            <p class="featured-desc">主导完成电商订单中心的服务化拆分，覆盖下单、库存、营销、结算四大域；构建统一 API 网关与领域事件总线，从零搭建灰度发布与回滚链路，让 24 个服务在双 11 流量峰值下保持安静。</p>
+            <ul class="chip-row">
+              <li class="chip">ASP.NET Core 8</li>
+              <li class="chip">Kubernetes</li>
+              <li class="chip">RabbitMQ</li>
+              <li class="chip">PostgreSQL</li>
+              <li class="chip">Redis</li>
+              <li class="chip">ArgoCD</li>
+            </ul>
+          </div>
+
+          <div class="metrics-panel">
+            <p class="metrics-label">关键指标</p>
+            <div class="metric-row">
+              <span class="metric-label">日均订单</span>
+              <span class="metric-value">320 万</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">峰值 QPS</span>
+              <span class="metric-value">8,400</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">可用率</span>
+              <span class="metric-value is-accent">99.96%</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">服务数</span>
+              <span class="metric-value">24</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- 小项目 1 -->
+        <article class="small-project reveal">
+          <p class="project-meta">
+            <span class="year-chip">2023</span>
+            <span class="meta-text">开源 · 告警治理</span>
+          </p>
+          <h3 class="small-title">OpsBuddy：把 800+ 告警降噪到 220 条</h3>
+          <p class="small-desc">基于 Prometheus 二开，自研时间序列聚类与沉默期策略；把每天 800+ 条告警收敛到 220 条，关键告警 0 漏报。</p>
+          <ul class="chip-row">
+            <li class="chip">Prometheus</li>
+            <li class="chip">Grafana</li>
+            <li class="chip">ML 降噪</li>
+          </ul>
+        </article>
+
+        <!-- 小项目 2 -->
+        <article class="small-project reveal">
+          <p class="project-meta">
+            <span class="year-chip">2026</span>
+            <span class="meta-text">开源 · 个人项目</span>
+          </p>
+          <h3 class="small-title">this.blog · 用 .NET 9 重写的本站</h3>
+          <p class="small-desc">本站本体。Minimal API + 自托管 k3s 单节点，写得越少越好。开源于 GitHub，欢迎提 issue 聊技术。</p>
+          <ul class="chip-row">
+            <li class="chip">.NET 9</li>
+            <li class="chip">Minimal API</li>
+            <li class="chip">Tailwind</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ 04 博客 ============ -->
+    <section class="section" id="blog">
+      <div class="blog-head">
+        <header class="section-head reveal">
+          <p class="eyebrow">// 04 博客</p>
+          <h2 class="section-title">最近写下的，<br>慢慢在变多。</h2>
+        </header>
+        <a class="blog-more reveal" href="#" >查看全部</a>
+      </div>
+
+      <div class="article-list reveal">
+        <a class="article-row" href="#">
+          <span class="article-date">2026.07.14</span>
+          <span class="article-title">把单体拆成微服务的第 7 年，我学到的事</span>
+          <span class="article-tag">架构</span>
+        </a>
+        <a class="article-row" href="#">
+          <span class="article-date">2026.06.02</span>
+          <span class="article-title">.NET 8 AOT 在生产网关的实测数据</span>
+          <span class="article-tag">性能</span>
+        </a>
+        <a class="article-row article-row-last" href="#">
+          <span class="article-date">2026.05.18</span>
+          <span class="article-title">Kubernetes 资源限额：一个 OOM 教训</span>
+          <span class="article-tag">运维</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ============ 05 Gooner Corner ============ -->
+    <section class="gunner" id="gooner">
+      <div class="gunner-grid">
+        <div class="gunner-copy reveal">
+          <p class="gunner-eyebrow">// 05 Gooner Corner</p>
+          <h2 class="gunner-title">北伦敦是红色的。</h2>
+          <p class="gunner-desc">写完代码的周末凌晨，属于酋长球场。胜也好、平也好，下一个赛季永远值得期待。</p>
+          <p class="gunner-slogan">
+            <span class="slogan-big">COYG</span>
+            <span class="slogan-sep" aria-hidden="true"></span>
+            <span class="slogan-est">Est. 1886</span>
+          </p>
+        </div>
+
+        <aside class="season-card reveal" aria-label="本赛季关注">
+          <p class="season-label">本赛季关注</p>
+          <dl class="season-list">
+            <div class="season-row">
+              <dt>主队</dt>
+              <dd class="is-accent">Arsenal</dd>
+            </div>
+            <div class="season-row">
+              <dt>主场</dt>
+              <dd>Emirates Stadium</dd>
+            </div>
+            <div class="season-row">
+              <dt>建队</dt>
+              <dd>1886</dd>
+            </div>
+            <div class="season-row">
+              <dt>口号</dt>
+              <dd class="is-accent">COYG</dd>
+            </div>
+          </dl>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ 页脚 ============ -->
+    <footer class="footer">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <p class="footer-logo"><span class="footer-word">L1u ZhiHenG</span><span class="footer-dot" aria-hidden="true"></span></p>
+          <p class="footer-tagline">.NET 后端工程师 · 微服务 · DevOps · 中国</p>
+        </div>
+        <div class="footer-contact">
+          <p class="footer-cta">有项目想聊？直接邮件。</p>
+          <a class="footer-mail" href="mailto:lzh.message@gmail.com">lzh.message@gmail.com</a>
+        </div>
+      </div>
+
+      <div class="footer-divider" aria-hidden="true"></div>
+
+      <div class="footer-bottom">
+        <p class="footer-copy">Copyright 2026 L1u ZhiHenG. · Built with .NET 8</p>
+        <p class="footer-north">North London Forever.</p>
+      </div>
+    </footer>
+
+  </main>
 
 </body>
 </html>
